@@ -14,14 +14,14 @@ def show_prediction_visualization():
     ### 🎯 Latar Belakang Proyek  
     Efisiensi waktu pengantaran merupakan salah satu faktor penting dalam layanan logistik makanan.  
     Berdasarkan eksplorasi data, ditemukan bahwa waktu layanan (Total Service Time) dipengaruhi oleh beberapa faktor seperti waktu persiapan, jarak tempuh, cuaca, dan tingkat kemacetan.  
-    Untuk meningkatkan ketepatan estimasi waktu sampai (ETA), proyek ini membangun model prediksi berbasis **Linear Regression** yang mampu memproyeksikan durasi layanan secara real-time.  
+    Untuk meningkatkan ketepatan estimasi waktu sampai (ETA), proyek ini membangun model prediksi berbasis **Lasso Regression** yang mampu memproyeksikan durasi layanan secara real-time.  
     Model ini diharapkan membantu operasional logistik dalam mengoptimalkan rute, alokasi armada, serta memberikan transparansi waktu pengiriman kepada pelanggan.
 
     ---
     """)
 
     # Load model
-    model = joblib.load("linear_regression_model.pkl")
+    model = joblib.load("lasso_model.pkl")
 
     # Pilih dataset
     option = st.radio("Pilih Dataset", ["Training", "Testing"])
@@ -45,7 +45,7 @@ def show_prediction_visualization():
     r2 = r2_score(y, y_pred)
 
     # Tampilkan metrik
-    st.subheader("📊 Evaluasi Model Linear Regression")
+    st.subheader("📊 Evaluasi Model Lasso Regression")
     st.markdown(f"""
     - **MAE**: {mae:.2f} menit  
     - **MSE**: {mse:.2f}  
@@ -55,15 +55,49 @@ def show_prediction_visualization():
 
     st.markdown("""
     ---
-    📘 **Penjelasan Evaluasi Model**  
-    - **MAE**: Rata-rata selisih absolut antara nilai aktual dan prediksi.  
-    - **MSE**: Rata-rata kuadrat selisih prediksi.  
-    - **RMSE**: Akar dari MSE, menunjukkan besaran kesalahan dengan satuan yang sama dengan target.  
-    - **R² Score**: Proporsi variansi yang bisa dijelaskan oleh model. Semakin mendekati 1, semakin baik.
-    
-    Hasil evaluasi menunjukkan bahwa **model Linear Regression** memberikan performa yang konsisten, akurat, dan mudah diinterpretasikan untuk kebutuhan operasional.
+    📘 **Interpretasi Hasil Evaluasi Model Lasso Regression (Data Training)**
+
+    - **MAE (Mean Absolute Error)** = 6.53 menit  
+    Rata-rata kesalahan absolut antara nilai aktual dan hasil prediksi adalah sekitar 6.53 menit. Ini berarti model cenderung meleset sekitar 6 hingga 7 menit dalam memperkirakan waktu layanan aktual.
+
+    - **MSE (Mean Squared Error)** = 105.99  
+    MSE mengkuadratkan error, sehingga memberikan penalti lebih besar terhadap kesalahan besar. Nilai ini menunjukkan masih ada beberapa prediksi yang cukup jauh dari nilai aktual.
+
+    - **RMSE (Root Mean Squared Error)** = 10.30  
+    Dengan satuan yang sama dengan target (menit), RMSE memberi gambaran bahwa prediksi model kadang bisa meleset sekitar 10 menit.
+
+    - **R² Score (Koefisien Determinasi)** = 0.7750  
+    Nilai ini mengindikasikan bahwa sekitar 77.5% variasi dalam `Delivery_Time_min` dapat dijelaskan oleh fitur yang digunakan dalam model. Semakin mendekati 1, semakin baik model dalam menangkap pola data.
+
     ---
+
+    📌 **Kesimpulan**  
+    Model Lasso menunjukkan performa yang cukup baik pada data training. Dengan kombinasi error yang rendah dan R² yang mendekati 0.8, model ini layak digunakan untuk estimasi awal waktu layanan pengiriman makanan, namun tetap disarankan untuk dievaluasi lebih lanjut pada data testing untuk validasi generalisasi model.
     """)
+
+
+    st.markdown("""
+    ---
+    📘 **Interpretasi Hasil Evaluasi Model Lasso Regression (Data Testing)**
+
+    - **MAE (Mean Absolute Error)** = 6.32 menit  
+    Rata-rata kesalahan absolut antara hasil prediksi dan nilai aktual pada data testing adalah sekitar 6.32 menit. Ini menunjukkan tingkat kesalahan prediksi yang relatif rendah di luar data pelatihan.
+
+    - **MSE (Mean Squared Error)** = 123.75  
+    Nilai MSE yang cukup rendah menunjukkan bahwa model mampu menjaga kesalahan besar tetap minimal meskipun terdapat data baru yang belum pernah dilihat sebelumnya.
+
+    - **RMSE (Root Mean Squared Error)** = 11.12  
+    Dengan satuan menit, nilai RMSE mengindikasikan deviasi prediksi terhadap nilai aktual berada di kisaran 11 menit.
+
+    - **R² Score (Koefisien Determinasi)** = 0.7745  
+    Sekitar 77.45% variasi dalam variabel target (`Delivery_Time_min`) pada data testing berhasil dijelaskan oleh model. Ini menunjukkan bahwa model memiliki kemampuan generalisasi yang cukup baik.
+
+    ---
+
+    📌 **Kesimpulan**  
+    Evaluasi pada data testing menunjukkan bahwa model Lasso mempertahankan performa prediksi yang stabil di luar data pelatihan. Dengan error yang tetap rendah dan nilai R² yang cukup tinggi, model ini cocok digunakan untuk memprediksi waktu layanan dalam skenario nyata.
+    """)
+
 
     # Scatter plot
     st.subheader("📌 Scatter Plot: Actual vs Predicted")
